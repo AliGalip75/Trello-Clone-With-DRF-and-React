@@ -73,43 +73,29 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 # 2. COOKIE'DEN REFRESH YAPAN VIEW 
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
-        # 1. Cookie'den refresh token'ı çek
+        # Cookie'den refresh token'ı alıp serializer'a verelim
         refresh_token = request.COOKIES.get('refresh_token')
         
-        # 2. Eğer cookie varsa, isteğin içine enjekte et
         if refresh_token:
-            data = request.data.copy() # Immutable hatasını engeller
-            data['refresh'] = refresh_token
+            request.data['refresh'] = refresh_token
+        
+        try:
+            response = super().post(request, *args, **kwargs)
             
-            # SimpleJWT serializer'ını manuel çalıştır
-            serializer = self.get_serializer(data=data)
-            
-            try:
-                serializer.is_valid(raise_exception=True)
-            except TokenError as e:
-                raise InvalidToken(e.args[0])
-                
-            # 3. Yeni Access Token'ı al ve yanıt oluştur
-            res_data = serializer.validated_data
-            response = Response(res_data, status=status.HTTP_200_OK)
-            
-            # 4. Yeni Access Token'ı Cookie'ye bas
+            # Yeni Access Token'ı tekrar cookie'ye yaz
+            access_token = response.data['access']
             response.set_cookie(
                 key='access_token',
-                value=res_data['access'],
+                value=access_token,
                 httponly=True,
-                secure=not settings.DEBUG,
+                secure=False,
                 samesite='Lax',
-                path='/',
-                max_age=5 * 60 # 5 dakika
+                max_age=5 * 60
             )
-            
-            # JSON yanıtından access'i sil (Sadece cookie'de kalsın)
-            del response.data['access']
             return response
-        
-        # Cookie yoksa standart işleme devam et (hata verecektir)
-        return super().post(request, *args, **kwargs)
+            
+        except (InvalidToken, TokenError):
+            return Response({"detail": "Token geçersiz"}, status=status.HTTP_401_UNAUTHORIZED)
     
 class LogoutView(APIView):
     # Giriş yapmamış adam çıkış yapamaz

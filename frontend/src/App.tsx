@@ -1,31 +1,45 @@
-// src/App.tsx
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
-import PublicLayout from './layouts/PublicLayout';
+import PublicLayout from '@/layouts/PublicLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 
+// Auth
+import AuthGuard from '@/components/auth/AuthGuard';
+
+// Boards
+import BoardsPage from '@/pages/BoardsPage';
+import BoardDetailPage from '@/pages/BoardDetailPage';
 
 // Pages
-import HomePage from './pages/HomePage';
-
-// import BoardPage from './pages/BoardPage'; // İleride kullanacağız
+import HomePage from '@/pages/HomePage';
 
 function App() {
   return (
     <Routes>
       
-      {/* 1. GRUP: Public Layout (Header + Footer var) */}
+      {/* --- PUBLIC ROUTES --- */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomePage />} />
-        {/* Hakkımızda, İletişim gibi sayfalar da buraya eklenebilir */}
       </Route>
 
-      {/* 2. GRUP: Dashboard/Board Layout (İleride Yapacağız) */}
-      {/* Kullanıcı giriş yaptığında burası çalışacak */}
-      {/* <Route path="/boards" element={<DashboardLayout />}> ... </Route> */}
+      {/* --- PRIVATE ROUTES (PROTECTED) --- */}
+      {/* 1. First, check if user is logged in */}
+      <Route element={<AuthGuard />}>
+        
+        {/* 2. Then, apply the Dashboard Layout */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          
+          {/* 3. Finally, render the specific pages */}
+          <Route path="/dashboard/boards/" element={<BoardsPage />} />
+          <Route path="/dashboard/boards/:boardId/" element={<BoardDetailPage />} />
+          
+        </Route>
 
-      {/* Hatalı URL girilirse anasayfaya yönlendir */}
+      </Route>
+
+
+      {/* --- 404 HANDLING --- */}
       <Route path="*" element={<Navigate to="/" replace />} />
 
     </Routes>

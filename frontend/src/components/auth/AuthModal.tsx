@@ -11,6 +11,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
+import { toast } from "sonner"
 
 export function AuthModal() {
   const [activeTab, setActiveTab] = useState("login")
@@ -37,7 +39,7 @@ export function AuthModal() {
     
     registerMutation.mutate(registerData, {
       onSuccess: () => {
-        alert("Kayıt Başarılı!")
+        toast.success("Successfully registered!", {position: "bottom-right"})
         setActiveTab("login")
         registerForm.reset()
       }
@@ -52,7 +54,7 @@ export function AuthModal() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">TrelloClone</DialogTitle>
           <DialogDescription className="text-center">Manage your projects efficiently.</DialogDescription>
@@ -67,8 +69,8 @@ export function AuthModal() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Log In</TabsTrigger>
-            <TabsTrigger value="register">Sign Up</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="login">Log In</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="register">Sign Up</TabsTrigger>
           </TabsList>
 
           {/* LOGIN FORM */}
@@ -84,8 +86,8 @@ export function AuthModal() {
                     <Input id="password" type="password" {...loginForm.register("password")} />
                     {loginForm.formState.errors.password && <span className="text-red-500 text-xs">{loginForm.formState.errors.password.message}</span>}
                 </div>
-                <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                    {loginMutation.isPending ? "Logging in..." : "Log In"}
+                <Button type="submit" className="cursor-pointer w-full" disabled={loginMutation.isPending}>
+                    {loginMutation.isPending ? <Spinner /> : "Log In"}
                 </Button>
             </form>
           </TabsContent>
@@ -120,8 +122,8 @@ export function AuthModal() {
                     <Input type="password" {...registerForm.register("confirmPassword")} />
                     {registerForm.formState.errors.confirmPassword && <span className="text-red-500 text-xs">{registerForm.formState.errors.confirmPassword.message}</span>}
                 </div>
-                <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-                    {registerMutation.isPending ? "Signing up..." : "Sign Up"}
+                <Button type="submit" className="cursor-pointer w-full" disabled={registerMutation.isPending}>
+                    {registerMutation.isPending ? <Spinner />: "Sign Up"}
                 </Button>
             </form>
           </TabsContent>

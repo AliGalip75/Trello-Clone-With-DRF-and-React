@@ -12,15 +12,10 @@
 - **Tamamlananlar:**
   - [x] Proje kurulumu (Docker olmadan venv ile kurulumu tamamlandı).
   - [x] Backend: Card, List, Card, Board modelleri yazıldı, bunların serlaizer'ları, view'leri ve testleri yazıldı.
-  - [ ] Backend: Kullanıcı giriş çıkış işlemleri hiç yapılmadı.
-  - [ ] Frontend: Login ve Register için sayfalar oluşturuldu ama düzenleme gerekli.
+  - [x] Backend: JWT ayarları yapıldı.
 
 
 - **Üzerinde Çalıştığımız Son Dosya:**
-  - `frontend/src/pages/LoginPage.tsx`
-  - `frontend/src/pages/RegisterPage.tsx`
-  - `frontend/src/pages/HomePage.tsx`
-  - `frontend/src/pages/BoardPage.tsx`
 
 - **Aktif Hata/Sorun:**
   - Yok.
@@ -36,14 +31,20 @@ TRELLOCLONE/
     ├── src/
     │   ├── components/
     │   ├── services/ (api çağrıları)
+    |       ├── api.ts
+    |       └── auth.service.ts
     |   ├── pages/
     |   |   ├── LoginPage.tsx
     |   |   ├── RegisterPage.tsx
     |   |   ├── HomePage.tsx
     |   |   └── BoardPage.tsx
     |   ├── layouts/
+    |       └── publicLayout.tsx
+    |   ├── utils/
     |   ├── types/
+    |       └── index.ts
     |   ├── hooks/
+    |       └── useAuth.ts
     |   ├── assets/
     │   └── store/ (zustand)
 

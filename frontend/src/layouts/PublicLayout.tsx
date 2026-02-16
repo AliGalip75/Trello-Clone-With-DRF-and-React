@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './components/header';
+import Header from './components/public/Public.header';
+import { Toaster } from "@/components/ui/sonner";
 
 
 const PublicLayout: React.FC = () => {
@@ -13,6 +14,7 @@ const PublicLayout: React.FC = () => {
 
       {/* --- CONTENT (Değişen Kısım) --- */}
       <main className="flex-1">
+        <Toaster />
         {/* Outlet: React Router buraya HomePage, AboutPage gibi sayfaları yerleştirecek */}
         <Outlet />
       </main>

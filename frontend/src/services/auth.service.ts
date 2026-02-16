@@ -1,32 +1,30 @@
-// src/services/auth.service.ts
-
 import api from "./api";
 // Tipleri buradan çekiyoruz
 import type { LoginValues, RegisterValues, User } from "@/types"; 
 
 export const authService = {
-  // Login isteği
+  // Login
   login: async (data: LoginValues) => {
-    // Backend access/refresh token döner (Cookie modunda body boş dönebilir)
     const response = await api.post("/login/", data);
+    console.log(response.data)
     return response.data;
   },
 
-  // Register isteği
+  // Register
   register: async (data: RegisterValues) => {
     const response = await api.post("/register/", data);
     return response.data;
   },
 
-  // Logout isteği
+  // Logout
   logout: async () => {
     const response = await api.post("/logout/");
     return response.data;
   },
 
-  // Kullanıcı bilgilerini getir (Me endpoint)
-  // Cevabın bir 'User' objesi olacağını taahhüt ediyoruz (Promise<User>)
+  // Me endpoint
   getMe: async (): Promise<User> => {
+    console.log("⚡ SERVICE: getMe çağrıldı!");
     const response = await api.get("/me/");
     return response.data;
   },
