@@ -1,5 +1,6 @@
 import random
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from faker import Faker
 from django.contrib.auth import get_user_model
 from api.models import Board, List, Card, Comment
@@ -33,7 +34,11 @@ class Command(BaseCommand):
 
         users = []
         for _ in range(num_users):
-            user = User.objects.create_user(username=fake.user_name(), password='password123')
+            user = User.objects.create_user(
+                username=fake.user_name(), 
+                email=fake.email(), 
+                password='password123'
+            )
             users.append(user)
         self.stdout.write(f'{len(users)} users created.')
 
@@ -42,8 +47,17 @@ class Command(BaseCommand):
             for _ in range(num_boards):
                 board = Board.objects.create(
                     owner=user,
-                    name=fake.catch_phrase()
+                    name=fake.catch_phrase(),
+                    # Generate a random hex color for the background
+                    background_color=fake.hex_color()
                 )
+                
+                # Assign random members to the board, excluding the owner
+                potential_members = [u for u in users if u != user]
+                if potential_members:
+                    members_to_add = random.sample(potential_members, k=random.randint(0, len(potential_members)))
+                    board.members.set(members_to_add)
+
                 boards.append(board)
         self.stdout.write(f'{len(boards)} boards created.')
 
@@ -65,7 +79,9 @@ class Command(BaseCommand):
                     list=list_obj,
                     name=fake.sentence(nb_words=4),
                     description=fake.text(),
-                    order=i
+                    order=i,
+                    # Add a random due date in the future with timezone awareness
+                    due_date=fake.future_datetime(end_date='+30d', tzinfo=timezone.get_current_timezone())
                 )
                 cards.append(card)
         self.stdout.write(f'{len(cards)} cards created.')

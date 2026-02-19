@@ -1,11 +1,10 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {  
-  PlusCircle, 
   Search, 
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { type User } from '@/types/index';
+import { CreateBoardModal } from "@/layouts/components/dashboard/CreateBoardModal";
 
 interface HeaderProps {
   user?: User | null;   // optional yapman mantıklı (giriş yapmamışsa vs.)
@@ -33,9 +32,7 @@ export function Header({ user }: HeaderProps) {
 
       {/* Sağ ikonlar */}
       <div className="flex items-center gap-4">
-        <Button className="cursor-pointer " variant="ghost" size="icon">
-          <PlusCircle className="h-5 w-5" />
-        </Button>
+        <CreateBoardModal />
         <Avatar className="h-8 w-8">
           <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
           <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>

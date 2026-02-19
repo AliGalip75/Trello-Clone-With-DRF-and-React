@@ -16,18 +16,18 @@ export const useAuth = () => {
       try {
         return await authService.getMe();
       } catch (error: any) {
-        // Backend 401/403 dönerse kullanıcı yok demektir (null).
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        if (error.response?.status === 401) {
           return null;
         }
         throw error;
       }
     },
-    retry: false, 
-    staleTime: 1000 * 60 * 5, // 5 dakika boyunca "taze" kabul et
-    refetchOnWindowFocus: false,
+    retry: false,
+    staleTime: Infinity,
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
+
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginValues) => authService.login(data),

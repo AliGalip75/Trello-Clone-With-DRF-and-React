@@ -5,7 +5,6 @@ import {
   SidebarGroup, 
   SidebarGroupContent, 
   SidebarGroupLabel, 
-  SidebarHeader, 
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
@@ -18,8 +17,6 @@ import {
   Home, 
   LayoutDashboard, 
   PlusCircle, 
-  Search, 
-  UserCircle, 
   LogOut,
   Settings
 } from 'lucide-react';
@@ -30,18 +27,15 @@ interface AppSidebarProps {
   user?: User | null;
   onLogout: () => void;
   isLogoutPending?: boolean;
-  // İleride: boards?: Board[] → dinamik board listesi için
 }
 
 const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps) => {
   return (
     <Sidebar collapsible="icon" className="border-r">
-      {/* Header aynı */}
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel 
-            className="group-data-[collapsible=icon]:hidden"  // Label'ı collapsed'ta gizle (opsiyonel ama önerilir)
+            className="group-data-[collapsible=icon]:hidden"
           >
             Workspace
           </SidebarGroupLabel>
@@ -51,7 +45,7 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
                 <SidebarMenuButton asChild tooltip="Home">
                   <Link to="/">
                     <Home className="h-5 w-5" />
-                    <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Home</span>  {/* ← BURAYA EKLE */}
+                    <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Home</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -60,7 +54,7 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
                 <SidebarMenuButton asChild tooltip="Boards">
                   <Link to="/boards">
                     <LayoutDashboard className="h-5 w-5" />
-                    <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Boards</span>  {/* ← BURAYA EKLE */}
+                    <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Boards</span> 
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -68,14 +62,13 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
               <SidebarMenuItem>
                 <SidebarMenuButton tooltip="Create new board">
                   <PlusCircle className="h-5 w-5" />
-                  <span className="cursor-pointer group-data-[collapsible=icon]:hidden">New Board</span>  {/* ← BURAYA EKLE */}
+                  <span className="cursor-pointer group-data-[collapsible=icon]:hidden">New Board</span> 
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Your Boards grubu için de aynı */}
         <SidebarGroup>
           <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
             Your Boards
@@ -91,20 +84,18 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* diğer board'lar da aynı class'ı alsın */}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer'daki metinler için de gizle (isim ve email) */}
       <SidebarFooter className="border-t p-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
             <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">  {/* ← Tüm kullanıcı bilgisini gizle */}
+          <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-medium truncate">
               {user?.full_name || 'Kullanıcı'}
             </span>
@@ -114,7 +105,6 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
           </div>
         </div>
 
-        {/* Settings ve Log out butonları da metin gizlensin */}
         <div className="mt-4 flex flex-col gap-1 group-data-[collapsible=icon]:hidden">
           <Button variant="ghost" size="sm" className="cursor-pointer justify-start">
             <Settings className="mr-2 h-4 w-4" />
