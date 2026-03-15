@@ -36,12 +36,12 @@ class Board(models.Model):
                 pass
 
             img = Image.open(self.background_image)
-            if img.width > 1280 or img.height > 720:
-                output_size = (1280, 720)
+            if img.width > 1920 or img.height > 1080:
+                output_size = (1920, 1080)
                 img.thumbnail(output_size, Image.Resampling.LANCZOS)
                 output_io = BytesIO()
                 img_format = img.format if img.format else 'JPEG'
-                img.save(output_io, format=img_format, quality=85)
+                img.save(output_io, format=img_format, quality=90)
                 self.background_image = File(output_io, name=self.background_image.name)
                 
         super().save(*args, **kwargs)
