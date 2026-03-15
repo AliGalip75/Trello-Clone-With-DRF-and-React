@@ -5,7 +5,7 @@ from django.utils import timezone
 class UserManager(BaseUserManager):
     """
     Custom User Manager.
-    Handles the creation logic for both standard users and superusers.
+    Handles the creation logic for both standard users and superusers. 
     Replacing the default Django manager to support Email-based authentication.
     """
 
@@ -19,6 +19,10 @@ class UserManager(BaseUserManager):
         # Normalize the email address (lowercase the domain part)
         email = self.normalize_email(email)
 
+        # Create username from email if not provided
+        if 'username' not in extra_fields or not extra_fields.get('username'):
+            extra_fields['username'] = email.split('@')[0]  # Temporary username
+            
         # Create the user instance
         user = self.model(
             email=email,
@@ -50,7 +54,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser, PermissionsMixin):
+class User(AbstractUser):
     """
     Custom User Model.
     Replaces Django's default 'User' model.
@@ -77,15 +81,6 @@ class User(AbstractUser, PermissionsMixin):
     # =========================
     # PERSONAL INFO
     # =========================
-    first_name = models.CharField(
-        max_length=150,
-        blank=True,
-    )
-
-    last_name = models.CharField(
-        max_length=150,
-        blank=True,
-    )
 
     phone_number = models.CharField(
         max_length=20,
@@ -98,7 +93,6 @@ class User(AbstractUser, PermissionsMixin):
         blank=True,
     )
 
-    # Requires 'Pillow' library to be installed
     profile_image = models.ImageField(
         upload_to="users/profile_images/",
         null=True,
@@ -106,40 +100,6 @@ class User(AbstractUser, PermissionsMixin):
     )
     
     bio = models.TextField(
-        blank=True,
-    )
-
-    # =========================
-    # STATUS & PERMISSIONS
-    # =========================
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
-    )
-
-    is_staff = models.BooleanField(
-        default=False,
-        help_text="Designates whether the user can log into this admin site.",
-    )
-
-    # PermissionsMixin provides:
-    # - is_superuser
-    # - groups
-    # - user_permissions
-
-    # =========================
-    # TIMESTAMPS
-    # =========================
-    date_joined = models.DateTimeField(
-        default=timezone.now,
-    )
-
-    last_updated = models.DateTimeField(
-        auto_now=True,
-    )
-
-    last_login = models.DateTimeField(
-        null=True,
         blank=True,
     )
 
@@ -165,11 +125,12 @@ class User(AbstractUser, PermissionsMixin):
     # =========================
     # AUTH CONFIGURATION
     # =========================
+
     # This tells Django to use 'email' field for login
     USERNAME_FIELD = "email" 
     
     # Fields required when creating a superuser via CLI (besides email and password)
-    REQUIRED_FIELDS = [] 
+    REQUIRED_FIELDS = ["username"] 
 
     # Link the custom manager
     objects = UserManager()
@@ -222,6 +183,7 @@ class User(AbstractUser, PermissionsMixin):
         """
         self.failed_login_attempts += 1
         self.save(update_fields=["failed_login_attempts"])
+
 
     class Meta:
         verbose_name = "User"

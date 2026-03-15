@@ -25,8 +25,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'email', 'password', 'first_name', 'last_name')
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True},
+            'first_name': {'required': True, 'allow_blank': False},
+            'last_name': {'required': True, 'allow_blank': False},
         }
 
     def create(self, validated_data):
@@ -35,6 +35,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         This ensures the password is hashed properly before saving.
         """
         user = User.objects.create_user(
+            username=validated_data.get('first_name')  + " " + validated_data.get('last_name'),
             email=validated_data['email'],
             password=validated_data['password'],
             first_name=validated_data.get('first_name', ''),

@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from PIL import Image
 from io import BytesIO
 from django.core.files import File
-import os
 
 User = get_user_model()
 
@@ -25,22 +24,26 @@ class Board(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     # Override save method to scale down large images
+    # Updated save method for Board
     def save(self, *args, **kwargs):
         if self.background_image:
+            # Check if the image has changed to avoid redundant processing
+            try:
+                old_instance = Board.objects.get(pk=self.pk)
+                if old_instance.background_image == self.background_image:
+                    return super().save(*args, **kwargs)
+            except Board.DoesNotExist:
+                pass
+
             img = Image.open(self.background_image)
-            
-            # Scale down if dimensions exceed 1280x720
             if img.width > 1280 or img.height > 720:
                 output_size = (1280, 720)
                 img.thumbnail(output_size, Image.Resampling.LANCZOS)
-                
                 output_io = BytesIO()
                 img_format = img.format if img.format else 'JPEG'
-                # Compress slightly for better performance
                 img.save(output_io, format=img_format, quality=85)
-                
                 self.background_image = File(output_io, name=self.background_image.name)
-        
+                
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -67,6 +70,7 @@ class List(models.Model):
         verbose_name_plural = "Lists"
         db_table = "list"
         ordering = ['order']
+        unique_together = ('board', 'order')
 
 class Card(models.Model):
     list = models.ForeignKey(List, related_name='cards', on_delete=models.CASCADE)
@@ -87,6 +91,7 @@ class Card(models.Model):
         verbose_name_plural = "Cards"
         db_table = "card"
         ordering = ['order']
+        unique_together = ('list', 'order')
 
 class Comment(models.Model):
     card = models.ForeignKey(Card, related_name='comments', on_delete=models.CASCADE)
