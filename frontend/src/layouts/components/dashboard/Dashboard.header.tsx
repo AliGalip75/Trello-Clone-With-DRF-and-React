@@ -3,7 +3,7 @@ import {
   Search, 
   Kanban
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { type User } from '@/types/index';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -15,6 +15,9 @@ interface HeaderProps {
 }
 
 export function Header({ user, hideSidebarTrigger }: HeaderProps) {
+
+  const { pathname } = useLocation();
+  const isBoardDetail = pathname.match(/\/dashboard\/boards\/[^/]+/);
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
@@ -45,7 +48,7 @@ export function Header({ user, hideSidebarTrigger }: HeaderProps) {
       {/* Sağ ikonlar */}
       <div className="flex items-center gap-2">
         <ThemeToggle />
-        <CreateBoardModal />
+        {!isBoardDetail && <CreateBoardModal />}
         <Avatar className="h-8 w-8 ml-2">
           <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
           <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>

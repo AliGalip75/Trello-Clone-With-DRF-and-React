@@ -29,3 +29,7 @@ export const getBoard = async (id: string): Promise<BoardResponse> => {
   const response = await api.get<BoardResponse>(`/boards/${id}/`);
   return response.data;
 };
+
+export const deleteBoard = async (id: number): Promise<void> => {
+  await api.delete(`/boards/${id}/`);
+};
