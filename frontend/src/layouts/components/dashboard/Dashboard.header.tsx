@@ -1,22 +1,34 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {  
   Search, 
+  Kanban
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { type User } from '@/types/index';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { CreateBoardModal } from "@/layouts/components/dashboard/CreateBoardModal";
 
 interface HeaderProps {
   user?: User | null;   // optional yapman mantıklı (giriş yapmamışsa vs.)
+  hideSidebarTrigger?: boolean;
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, hideSidebarTrigger }: HeaderProps) {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
       
       {/* Toggle butonu – mobil için görünür olur */}
-      <SidebarTrigger className="cursor-pointer mr-2" /> {/* shadcn'in hazır toggle butonu */}
+      {!hideSidebarTrigger && <SidebarTrigger className="cursor-pointer mr-2" />} {/* shadcn'in hazır toggle butonu */}
+
+      {/* Logo ve Uygulama İsmi */}
+      <Link to="/dashboard/boards" className="flex items-center gap-2 font-bold text-lg transition-opacity hover:opacity-80">
+        <div className="bg-blue-600 text-white p-1 rounded">
+          <Kanban className="h-5 w-5" />
+        </div>
+        <span className="hidden sm:inline-block">Trello Clone</span>
+      </Link>
 
       {/* Arama alanı */}
       <div className="flex flex-1 items-center gap-4">
@@ -31,9 +43,10 @@ export function Header({ user }: HeaderProps) {
       </div>
 
       {/* Sağ ikonlar */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
         <CreateBoardModal />
-        <Avatar className="h-8 w-8">
+        <Avatar className="h-8 w-8 ml-2">
           <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
           <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
         </Avatar>

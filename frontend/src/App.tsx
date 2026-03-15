@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import PublicLayout from '@/layouts/PublicLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 
+import BoardLayout from '@/layouts/BoardLayout';
+
 // Auth
 import AuthGuard from '@/components/auth/AuthGuard';
 
@@ -27,13 +29,14 @@ function App() {
       {/* 1. First, check if user is logged in */}
       <Route element={<AuthGuard />}>
         
-        {/* 2. Then, apply the Dashboard Layout */}
+        {/* 2. Dashboard Layout for Boards Page */}
         <Route path="/dashboard" element={<DashboardLayout />}>
-          
-          {/* 3. Finally, render the specific pages */}
           <Route path="/dashboard/boards/" element={<BoardsPage />} />
-          <Route path="/dashboard/boards/:boardId/" element={<BoardDetailPage />} />
-          
+        </Route>
+
+        {/* 3. Board Layout for Board Detail Page (No Sidebar) */}
+        <Route path="/dashboard/boards/:boardId/" element={<BoardLayout />}>
+          <Route index element={<BoardDetailPage />} />
         </Route>
 
       </Route>

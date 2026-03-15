@@ -25,6 +25,10 @@ export function CreateBoardModal() {
       setColor("#ffffff");
       setImage(null);
     },
+    onError: (error: any) => {
+      console.error("Board creation failed:", error.response?.data || error.message);
+      alert(`Error creating board: ${JSON.stringify(error.response?.data || error.message)}`);
+    }
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

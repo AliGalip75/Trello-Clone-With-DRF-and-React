@@ -11,19 +11,21 @@ export interface BoardResponse extends BoardData {
   id: number;
   created_at: string;
   updated_at: string;
+  lists: import("../types").List[];
 }
 
 // Update the service to accept FormData for file upload support
 export const createBoard = async (formData: FormData): Promise<BoardResponse> => {
-  const response = await api.post<BoardResponse>('/boards/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await api.post<BoardResponse>('/boards/', formData);
   return response.data;
 };
 
 export const getBoards = async (): Promise<BoardResponse[]> => {
   const response = await api.get<BoardResponse[]>('/boards/');
+  return response.data;
+};
+
+export const getBoard = async (id: string): Promise<BoardResponse> => {
+  const response = await api.get<BoardResponse>(`/boards/${id}/`);
   return response.data;
 };

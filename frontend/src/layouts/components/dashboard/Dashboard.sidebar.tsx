@@ -11,7 +11,7 @@ import {
   SidebarFooter,
   SidebarRail
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Home, 
@@ -49,16 +49,7 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Boards">
-                  <Link to="/boards">
-                    <LayoutDashboard className="h-5 w-5" />
-                    <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Boards</span> 
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
+              
               <SidebarMenuItem>
                 <SidebarMenuButton tooltip="Create new board">
                   <PlusCircle className="h-5 w-5" />
@@ -89,7 +80,7 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-4">
+      <SidebarFooter className="border-t p-4 group-data-[collapsible=icon]:p-2">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
@@ -105,22 +96,25 @@ const AppSidebar = ({ user, onLogout, isLogoutPending = false }: AppSidebarProps
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-1 group-data-[collapsible=icon]:hidden">
-          <Button variant="ghost" size="sm" className="cursor-pointer justify-start">
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="cursor-pointer justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={onLogout}
-            disabled={isLogoutPending}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Log out
-          </Button>
-        </div>
+        <SidebarMenu className="mt-4 group-data-[collapsible=icon]:mt-0">
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Settings">
+              <Settings className="h-5 w-5" />
+              <span className="cursor-pointer group-data-[collapsible=icon]:hidden">Settings</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              tooltip="Log out" 
+              onClick={onLogout}
+              disabled={isLogoutPending}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="group-data-[collapsible=icon]:hidden">Log out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
 
       <SidebarRail />

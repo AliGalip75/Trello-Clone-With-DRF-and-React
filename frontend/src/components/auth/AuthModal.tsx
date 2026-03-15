@@ -14,7 +14,11 @@ import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 
-export function AuthModal() {
+interface AuthModalProps {
+  trigger?: React.ReactNode;
+}
+
+export function AuthModal({ trigger }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState("login")
   const [isOpen, setIsOpen] = useState(false)
   
@@ -49,9 +53,11 @@ export function AuthModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer hover:bg-black hover:text-white transition-colors" variant="outline">
-            Log in / Sign up
-        </Button>
+        {trigger || (
+          <Button className="cursor-pointer hover:bg-black hover:text-white transition-colors" variant="outline">
+              Log in / Sign up
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-106.25">

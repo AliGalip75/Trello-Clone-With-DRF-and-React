@@ -6,7 +6,7 @@ const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/', // Vite env değişkeni
   withCredentials: true, // ÖNEMLİ: Cookie'lerin backend'e gitmesi için şart
   headers: {
-    'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
 });
 

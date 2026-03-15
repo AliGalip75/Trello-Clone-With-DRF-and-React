@@ -3,9 +3,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Layout, Kanban } from "lucide-react";
+import { ArrowRight, CheckCircle2, Layout } from "lucide-react";
+
+import { AuthModal } from "@/components/auth/AuthModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const HomePage: React.FC = () => {
+  const { user } = useAuth();
+  
   return (
     <div className="flex flex-col min-h-screen">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-background">
@@ -20,11 +25,21 @@ const HomePage: React.FC = () => {
                 </p>
               </div>
               <div className="space-x-4">
-                <Link to="/dashboard/boards/">
-                  <Button className="cursor-pointer h-11 px-8" size="lg">
-                    Start for free <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link to="/dashboard/boards/">
+                    <Button className="cursor-pointer h-11 px-8" size="lg">
+                      Go to Dashboard <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <AuthModal 
+                    trigger={
+                      <Button className="cursor-pointer h-11 px-8" size="lg">
+                        Start for free <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    }
+                  />
+                )}
                 <Button variant="outline" size="lg" className="cursor-pointer h-11 px-8">
                   View Demo
                 </Button>
