@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,17 +20,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-lul56t&&@ja=v%xqie5*@+s=g0=d-li$d#sfm=fjvcjc-wn2f8"
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-key")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# Docker ağında Django konteyneri 'backend' olarak bilinecek
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "backend"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -64,11 +62,11 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'TrelloClone',       # Oluşturduğun DB adı
-        'USER': 'postgres',          # Postgres kullanıcı adın (genelde postgres)
-        'PASSWORD': '12345',  # Postgres şifren
-        'HOST': 'localhost',         # Docker kullanıyorsan servisin adı (örn: 'db'), lokalde 'localhost'
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'), # Burada 'db' yazacak (.env'den geliyor)
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 

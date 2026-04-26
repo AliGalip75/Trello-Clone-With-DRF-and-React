@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
+
 class UserManager(BaseUserManager):
     """
     Custom User Manager.
@@ -33,7 +34,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         
         # Save the user to the database
-        user.save(using=self._db)
+        user.save(using=self._db) # use self._db to support multiple databases if needed
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):

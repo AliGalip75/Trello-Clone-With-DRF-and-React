@@ -4,6 +4,7 @@ from PIL import Image
 from io import BytesIO
 from django.core.files import File
 
+
 User = get_user_model()
 
 # Generate dynamic path: user_<id>/boards_bg/<filename>
