@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+
+  backend:
+    build: ./backend
+    # Sen kodda değişiklik yapınca konteyneri durdurmadan yansıması için:
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db # Önce veritabanı hazır olmalı
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # node_modules'un ezilmemesi için kritik
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data: # Veritabanı konteyneri silinse bile veriler kaybolmaz

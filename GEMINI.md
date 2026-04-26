@@ -13,6 +13,9 @@
   - [x] Proje kurulumu (Docker olmadan venv ile kurulumu tamamlandı).
   - [x] Backend: Card, List, Card, Board modelleri yazıldı, bunların serlaizer'ları, view'leri ve testleri yazıldı.
   - [x] Backend: JWT ayarları yapıldı.
+  - [x] Backend: User modeli yazıldı, bunun serlaizer'ı, view'ı ve testi yazıldı.
+  - [x] Frontend: geçici landingpage yazıldı(homepage). BoardsPage yazıldı ve board'lar listelendi.
+  - [ ] Frontend: BoardsDetailPage yüzeysel olarak tasarlandı fakat backend tarafında henüz board detayları alınamadı.
 
 
 - **Üzerinde Çalıştığımız Son Dosya:**
@@ -25,6 +28,7 @@ TRELLOCLONE/
 ├── backend/
 │   ├── core/ (settings.py burada)
 │   ├── api/ (card, List, Comment gibi işlemleri burada)
+│   └── users/ (user işlemleri burada)
 └── frontend/
     ├── node_modules/
     ├── public/
@@ -32,12 +36,12 @@ TRELLOCLONE/
     │   ├── components/
     │   ├── services/ (api çağrıları)
     |       ├── api.ts
-    |       └── auth.service.ts
+    |       ├── auth.service.ts
+    |       └── board.service.ts
     |   ├── pages/
-    |   |   ├── LoginPage.tsx
-    |   |   ├── RegisterPage.tsx
+    |   |   ├── BoardDetailPage.tsx
     |   |   ├── HomePage.tsx
-    |   |   └── BoardPage.tsx
+    |   |   └── BoardsPage.tsx
     |   ├── layouts/
     |       └── publicLayout.tsx
     |   ├── utils/
@@ -49,12 +53,12 @@ TRELLOCLONE/
     │   └── store/ (zustand)
 
 ## 4. 🎯 Immediate Goal (Şu anki Hedef)
-- Trello için bir anasayfa ve daha sonra login ve register sayfaları düzenleyelim ve backendi oluşturalım.
+- Spesifik bir board içindetay sayfasını yapalım, backend kodlarından yola çıkarak yazacaksın.
 
 
 ## Coding Guidelines
-- **Dil:** Kod yorumları ve değişken isimlendirmeleri İngilizce olsun. (Bana açıklamaları Türkçe yap).
-- **Frontend:** Fonksiyonel component'ler kullan. "Any" tipi kullanmaktan kaçın, her şeyi strictly type yap.
+- **Dil:** Kod yorumları ve değişken isimlendirmeleri DAİMA İngilizce olsun. (Bana açıklamaları Türkçe yap).
+- **Frontend:** Fonksiyonel component'ler kullan. "Any" tipi SAKIN KULLANMA, her şeyi strictly type yap.
 - **Backend:** Class-based view'lar yerine mümkünse ViewSet'ler veya Function-based view'lar kullan (tercihine göre belirtebiliriz). Business logic'i "services" veya "selectors" dosyalarına ayır, view içinde boğulma.
 - **Error Handling:** Hataları yutma, frontend'e anlamlı hata mesajları dön.
 
