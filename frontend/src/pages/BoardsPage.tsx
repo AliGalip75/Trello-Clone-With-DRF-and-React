@@ -29,18 +29,18 @@ const BoardsPage = () => {
   if (isError) {
     return <div className="text-red-500 font-medium">Failed to load boards.</div>;
   }
-
   return (
+
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {/* Map through the fetched boards */}
       {boards?.map((board) => (
         <Link key={board.id} to={`/dashboard/boards/${board.id}`}>
           <Card className="relative mx-auto w-full max-w-sm pt-0 overflow-hidden">
             {/* Background color layer with inline style for dynamic hex codes */}
-            <div className="absolute inset-0 z-10"/>
+            <div className="absolute inset-0 z-10" />
 
             {/* Image or empty container layer */}
-            { board.background_image ? (
+            {board.background_image ? (
               <img
                 src={board.background_image}
                 alt="Board cover"

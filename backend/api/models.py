@@ -7,20 +7,43 @@ from django.core.files import File
 
 User = get_user_model()
 
+
+class Workspace(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    owner = models.ForeignKey(User, related_name='owned_workspaces', on_delete=models.CASCADE)
+    # Members who have access to all boards within this workspace (Option A)
+    members = models.ManyToManyField(User, related_name='workspaces', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Workspace"
+        verbose_name_plural = "Workspaces"
+        db_table = "workspace"
+        ordering = ['-updated_at']
+
+
 # Generate dynamic path: user_<id>/boards_bg/<filename>
 def board_bg_upload_path(instance, filename):
     return f'user_{instance.owner.id}/boards_bg/{filename}'
 
+
 class Board(models.Model):
+    # Every board must belong to a workspace (mandatory, null=False)
+    workspace = models.ForeignKey(Workspace, related_name='boards', on_delete=models.CASCADE)
     owner = models.ForeignKey(User, related_name='owned_boards', on_delete=models.CASCADE)
-    # Added members for collaboration
-    members = models.ManyToManyField(User, related_name='boards', blank=True)
+    # Board-level members for extra granular control on top of workspace membership
+    members = models.ManyToManyField(User, related_name='board_memberships', blank=True)
     name = models.CharField(max_length=100)
     # Added background for visual customization (could be a hex code or image URL)
     background_color = models.CharField(max_length=20, default="#ffffff")
     # Use the dynamic path function
     background_image = models.ImageField(upload_to=board_bg_upload_path, null=True, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

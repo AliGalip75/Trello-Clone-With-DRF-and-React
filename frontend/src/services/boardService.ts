@@ -1,35 +1,45 @@
 // services/boardService.ts
 import api from "./api";
+import type { Board } from "@/types";
 
 export interface BoardData {
   name: string;
-  background_image?: string; 
+  workspace: number;
+  background_image?: string;
   background_color: string;
 }
 
-export interface BoardResponse extends BoardData {
-  id: number;
-  created_at: string;
-  updated_at: string;
+export interface BoardResponse extends Omit<Board, "lists"> {
   lists: import("../types").List[];
 }
 
-// Update the service to accept FormData for file upload support
-export const createBoard = async (formData: FormData): Promise<BoardResponse> => {
-  const response = await api.post<BoardResponse>('/boards/', formData);
+/** Create a new board. Accepts FormData to support file uploads. */
+export const createBoard = async (formData: FormData): Promise<Board> => {
+  const response = await api.post<Board>("/boards/", formData);
   return response.data;
 };
 
-export const getBoards = async (): Promise<BoardResponse[]> => {
-  const response = await api.get<BoardResponse[]>('/boards/');
+/** Fetch all boards the current user has access to */
+export const getBoards = async (): Promise<Board[]> => {
+  const response = await api.get<Board[]>("/boards/");
   return response.data;
 };
 
-export const getBoard = async (id: string): Promise<BoardResponse> => {
-  const response = await api.get<BoardResponse>(`/boards/${id}/`);
+/** Fetch all boards belonging to a specific workspace */
+export const getBoardsByWorkspace = async (workspaceId: number): Promise<Board[]> => {
+  const response = await api.get<Board[]>("/boards/", {
+    params: { workspace: workspaceId },
+  });
   return response.data;
 };
 
+/** Fetch a single board by ID (includes lists → cards → comments) */
+export const getBoard = async (id: string): Promise<Board> => {
+  const response = await api.get<Board>(`/boards/${id}/`);
+  return response.data;
+};
+
+/** Delete a board by ID */
 export const deleteBoard = async (id: number): Promise<void> => {
   await api.delete(`/boards/${id}/`);
-};
+};

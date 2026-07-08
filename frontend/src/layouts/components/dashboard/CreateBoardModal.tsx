@@ -1,49 +1,68 @@
 // components/dashboard/CreateBoardModal.tsx
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBoard } from "@/services/boardService";
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle } from "lucide-react";
+import { toast } from "sonner";
 
-export function CreateBoardModal() {
+interface CreateBoardModalProps {
+  /** The workspace this board will be created inside */
+  workspaceId: number;
+  /** When provided, renders a custom trigger element instead of the default button */
+  trigger?: React.ReactNode;
+}
+
+export function CreateBoardModal({ workspaceId, trigger }: CreateBoardModalProps) {
   const [open, setOpen] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
-  const [color, setColor] = useState<string>("#ffffff");
+  const [color, setColor] = useState<string>("#4a90d9");
   const [image, setImage] = useState<File | null>(null);
-  
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: createBoard,
     onSuccess: () => {
-      // Refresh the boards list after successful creation
-      queryClient.invalidateQueries({ queryKey: ['boards'] });
+      // Refresh both the workspace detail and the global board list
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["workspace", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["boards"] });
+      toast.success("Board created!", { position: "bottom-right" });
       setOpen(false);
       setName("");
-      setColor("#ffffff");
+      setColor("#4a90d9");
       setImage(null);
     },
-    onError: (error: any) => {
-      console.error("Board creation failed:", error.response?.data || error.message);
-      alert(`Error creating board: ${JSON.stringify(error.response?.data || error.message)}`);
-    }
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: unknown }; message?: string };
+      toast.error(`Error: ${JSON.stringify(err.response?.data || err.message)}`, {
+        position: "bottom-right",
+      });
+    },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return;
-    
-    // Use FormData to handle file uploads
+
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("name", name.trim());
     formData.append("background_color", color);
-    
+    // Attach the workspace — required by the backend
+    formData.append("workspace", String(workspaceId));
     if (image) {
       formData.append("background_image", image);
     }
-    
+
     mutation.mutate(formData);
   };
 
@@ -56,30 +75,42 @@ export function CreateBoardModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer" variant="default">
-            <PlusCircle />
-        </Button>
+        {trigger ?? (
+          <Button className="cursor-pointer" variant="default" size="sm">
+            <PlusCircle className="h-4 w-4 mr-1" />
+            New Board
+          </Button>
+        )}
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create a new board</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          {/* Board name */}
           <div className="grid gap-2">
-            <label htmlFor="name" className="text-sm font-medium">Board Name</label>
+            <label htmlFor="board-name" className="text-sm font-medium">
+              Board Name <span className="text-destructive">*</span>
+            </label>
             <Input
-              id="name"
+              id="board-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Launch Campaign"
               required
             />
           </div>
+
+          {/* Background color */}
           <div className="grid gap-2">
-            <label htmlFor="color" className="text-sm font-medium">Background Color</label>
+            <label htmlFor="board-color" className="text-sm font-medium">
+              Background Color
+            </label>
             <div className="flex gap-2">
               <Input
-                id="color"
+                id="board-color"
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
@@ -94,20 +125,26 @@ export function CreateBoardModal() {
               />
             </div>
           </div>
+
+          {/* Background image */}
           <div className="grid gap-2">
-            <label htmlFor="image" className="text-sm font-medium">Background Image (Optional)</label>
+            <label htmlFor="board-image" className="text-sm font-medium">
+              Background Image{" "}
+              <span className="text-muted-foreground text-xs">(optional)</span>
+            </label>
             <Input
-              id="image"
+              id="board-image"
               type="file"
               accept="image/*"
               onChange={handleImageChange}
             />
           </div>
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Creating..." : "Create"}
+
+          <Button type="submit" disabled={mutation.isPending} className="cursor-pointer">
+            {mutation.isPending ? "Creating…" : "Create Board"}
           </Button>
         </form>
       </DialogContent>
     </Dialog>
   );
-}
+}

@@ -3,19 +3,50 @@ from django.db.models import F, Q
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Board, List, Card, Comment
-from .serializers import BoardSerializer, ListSerializer, CardSerializer, CommentSerializer
+from .models import Workspace, Board, List, Card, Comment
+from .serializers import WorkspaceSerializer, BoardSerializer, ListSerializer, CardSerializer, CommentSerializer
+
+
+# Helper: Q filter — a user can access a workspace if they own it or are a member
+def _workspace_access_q(user):
+    return Q(owner=user) | Q(members=user)
+
+
+# Helper: Q filter — a user can access a board if they have workspace access
+# or if they are the board owner / board member (granular fallback)
+def _board_access_q(user):
+    return (
+        Q(workspace__owner=user) |
+        Q(workspace__members=user) |
+        Q(owner=user) |
+        Q(members=user)
+    )
+
+
+class WorkspaceViewSet(viewsets.ModelViewSet):
+    serializer_class = WorkspaceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return workspaces where the user is the owner or a member
+        return Workspace.objects.filter(
+            _workspace_access_q(self.request.user)
+        ).prefetch_related('members', 'boards').select_related('owner').distinct()
+
+    def perform_create(self, serializer):
+        # Automatically assign the logged-in user as the workspace owner
+        serializer.save(owner=self.request.user)
+
 
 class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Return boards where the user is either the owner or a member
-        # Use prefetch_related and select_related to prevent N+1 query performance issues
+        # Return boards accessible via workspace membership or direct board membership
         return Board.objects.filter(
-            Q(owner=self.request.user) | Q(members=self.request.user)
-        ).prefetch_related('lists__cards__comments', 'members').select_related('owner').distinct()
+            _board_access_q(self.request.user)
+        ).prefetch_related('lists__cards__comments', 'members').select_related('owner', 'workspace').distinct()
 
     def perform_create(self, serializer):
         # Automatically assign the logged-in user as the board owner
@@ -27,9 +58,12 @@ class ListViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Check permissions via board ownership or membership
+        # Check permissions via workspace or board ownership/membership
         return List.objects.filter(
-            Q(board__owner=self.request.user) | Q(board__members=self.request.user)
+            Q(board__workspace__owner=self.request.user) |
+            Q(board__workspace__members=self.request.user) |
+            Q(board__owner=self.request.user) |
+            Q(board__members=self.request.user)
         ).prefetch_related('cards__comments').distinct()
 
 
@@ -38,9 +72,11 @@ class CardViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Check permissions via board ownership or membership
         return Card.objects.filter(
-            Q(list__board__owner=self.request.user) | Q(list__board__members=self.request.user)
+            Q(list__board__workspace__owner=self.request.user) |
+            Q(list__board__workspace__members=self.request.user) |
+            Q(list__board__owner=self.request.user) |
+            Q(list__board__members=self.request.user)
         ).prefetch_related('comments').distinct()
 
     @action(detail=True, methods=['post'])
@@ -66,21 +102,22 @@ class CardViewSet(viewsets.ModelViewSet):
                 if new_list_id and int(new_list_id) != old_list.id:
                     # Moving to a different list; verify permissions for the target list
                     try:
+                        accessible_boards = Board.objects.filter(
+                            _board_access_q(self.request.user)
+                        ).values('id')
                         new_list = List.objects.get(
                             id=new_list_id,
-                            board__id__in=Board.objects.filter(
-                                Q(owner=self.request.user) | Q(members=self.request.user)
-                            ).values('id')
+                            board__id__in=accessible_boards
                         )
                     except List.DoesNotExist:
                         return Response({"detail": "New list not found or permission denied."}, status=status.HTTP_404_NOT_FOUND)
 
                     # Remove card from old list's ordering by shifting subsequent cards up
                     old_list.cards.filter(order__gt=old_order).update(order=F('order') - 1)
-                    
+
                     # Add card to new list's ordering by shifting subsequent cards down
                     new_list.cards.filter(order__gte=new_order).update(order=F('order') + 1)
-                    
+
                     card.list = new_list
                 else:
                     # Moving within the same list
@@ -105,11 +142,13 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Check permissions via board ownership or membership
         return Comment.objects.filter(
-            Q(card__list__board__owner=self.request.user) | Q(card__list__board__members=self.request.user)
+            Q(card__list__board__workspace__owner=self.request.user) |
+            Q(card__list__board__workspace__members=self.request.user) |
+            Q(card__list__board__owner=self.request.user) |
+            Q(card__list__board__members=self.request.user)
         ).distinct()
 
     def perform_create(self, serializer):
         # Automatically assign the logged-in user as the comment author
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user)

@@ -1,39 +1,34 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import {  
-  Search, 
-  Kanban
-} from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type User } from '@/types/index';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { CreateBoardModal } from "@/layouts/components/dashboard/CreateBoardModal";
+import { Search, Kanban } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { type User } from "@/types/index";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface HeaderProps {
-  user?: User | null;   // optional yapman mantıklı (giriş yapmamışsa vs.)
+  user?: User | null;
   hideSidebarTrigger?: boolean;
 }
 
 export function Header({ user, hideSidebarTrigger }: HeaderProps) {
-
-  const { pathname } = useLocation();
-  const isBoardDetail = pathname.match(/\/dashboard\/boards\/[^/]+/);
-
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
-      
-      {/* Toggle butonu – mobil için görünür olur */}
-      {!hideSidebarTrigger && <SidebarTrigger className="cursor-pointer mr-2" />} {/* shadcn'in hazır toggle butonu */}
 
-      {/* Logo ve Uygulama İsmi */}
-      <Link to="/dashboard/boards" className="flex items-center gap-2 font-bold text-lg transition-opacity hover:opacity-80">
+      {/* Sidebar toggle */}
+      {!hideSidebarTrigger && <SidebarTrigger className="cursor-pointer mr-2" />}
+
+      {/* Logo */}
+      <Link
+        to="/dashboard/workspaces"
+        className="flex items-center gap-2 font-bold text-lg transition-opacity hover:opacity-80"
+      >
         <div className="bg-blue-600 text-white p-1 rounded">
           <Kanban className="h-5 w-5" />
         </div>
         <span className="hidden sm:inline-block">Trello Clone</span>
       </Link>
 
-      {/* Arama alanı */}
+      {/* Search */}
       <div className="flex flex-1 items-center gap-4">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -45,17 +40,16 @@ export function Header({ user, hideSidebarTrigger }: HeaderProps) {
         </div>
       </div>
 
-      {/* Sağ ikonlar */}
+      {/* Right side */}
       <div className="flex items-center gap-2">
         <ThemeToggle />
-        {!isBoardDetail && <CreateBoardModal />}
         <Avatar className="h-8 w-8 ml-2">
           <AvatarImage src={user?.profile_image ?? undefined} alt={user?.full_name} />
-          <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+          <AvatarFallback>{user?.full_name?.[0]?.toUpperCase() || "?"}</AvatarFallback>
         </Avatar>
       </div>
     </header>
   );
 }
 
-export default Header;
+export default Header;

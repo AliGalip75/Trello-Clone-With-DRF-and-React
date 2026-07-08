@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
               </div>
               <div className="space-x-4">
                 {user ? (
-                  <Link to="/dashboard/boards/">
+                  <Link to="/dashboard/workspaces">
                     <Button className="cursor-pointer h-11 px-8" size="lg">
                       Go to Dashboard <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
